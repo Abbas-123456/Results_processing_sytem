@@ -1,0 +1,138 @@
+{% extends "academics/base.html" %}
+{% load static %}
+
+{% block title %}Lecturer dashboard{% endblock %}
+{% block page_context %}Lecturer workspace{% endblock %}
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'academics/css/workspace.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="workspace-page lecturer-workspace">
+    <section class="workspace-hero workspace-hero-lecturer">
+        <div class="workspace-hero-copy">
+            <p class="workspace-eyebrow"><i class="bi bi-person-workspace me-2" aria-hidden="true"></i>LECTURER WORKSPACE</p>
+            <h1>Welcome, {{ lecturer.lecturer_name }}</h1>
+            <p>{{ lecturer.faculty.faculty_name }} &middot; Manage marks for your assigned course units.</p>
+        </div>
+        <a class="btn workspace-hero-action" href="{% url 'academics:result-entry' %}">
+            <i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Enter student marks
+        </a>
+    </section>
+
+    <section class="row g-3 workspace-stats" aria-label="Your teaching overview">
+        <div class="col-sm-6">
+            <div class="workspace-stat">
+                <span class="workspace-stat-icon"><i class="bi bi-journal-bookmark-fill" aria-hidden="true"></i></span>
+                <span class="workspace-stat-copy">
+                    <span class="workspace-stat-label">Assigned course units</span>
+                    <strong class="workspace-stat-value">{{ units|length }}</strong>
+                </span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="workspace-stat">
+                <span class="workspace-stat-icon workspace-stat-icon-alt"><i class="bi bi-check2-square" aria-hidden="true"></i></span>
+                <span class="workspace-stat-copy">
+                    <span class="workspace-stat-label">Results entered</span>
+                    <strong class="workspace-stat-value">{{ result_rows|length }}</strong>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <section class="workspace-section">
+        <div class="workspace-section-heading">
+            <div>
+                <h2>Your assigned units</h2>
+                <p>Course units available for result entry</p>
+            </div>
+        </div>
+        <div class="row g-3">
+            {% for unit in units %}
+                <div class="col-sm-6 col-xl-4">
+                    <article class="workspace-unit-card">
+                        <div class="workspace-unit-heading">
+                            <span class="workspace-unit-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span>
+                            <span class="workspace-credit">
+                                {% if unit.credit_allocation %}{{ unit.credit_allocation.credit_units }} credits{% else %}Credits pending{% endif %}
+                            </span>
+                        </div>
+                        <h3>{{ unit.unit_name }}</h3>
+                        <p>{{ unit.course.course_name }}</p>
+                        <div class="workspace-unit-meta">
+                            <span><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>{{ unit.academic_year }}</span>
+                            <span>Semester {{ unit.semester }}</span>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="workspace-empty-card">
+                        <span class="workspace-empty-icon"><i class="bi bi-journal-x" aria-hidden="true"></i></span>
+                        <h3>No units assigned yet</h3>
+                        <p>Please contact the Academic Registrar to assign your course units.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="workspace-panel">
+        <div class="workspace-panel-heading">
+            <div>
+                <h2><i class="bi bi-clock-history me-2" aria-hidden="true"></i>Recently entered results</h2>
+                <p>Latest marks recorded for your assigned units</p>
+            </div>
+            <a class="workspace-panel-link" href="{% url 'academics:result-entry' %}">
+                Enter marks<i class="bi bi-arrow-up-right ms-2" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle workspace-table mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Student</th>
+                        <th scope="col">Course unit</th>
+                        <th scope="col">Study session</th>
+                        <th scope="col">Marks</th>
+                        <th scope="col">Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in result_rows %}
+                        <tr>
+                            <td>
+                                <span class="workspace-student-name">{{ row.result.student.student_name }}</span>
+                                <small class="workspace-cell-subtitle">{{ row.result.student.reg_no }}</small>
+                            </td>
+                            <td>{{ row.result.unit.unit_name }}</td>
+                            <td>
+                                {{ row.result.session.academic_year }}
+                                <small class="workspace-cell-subtitle">Semester {{ row.result.session.semester }} · {{ row.result.session.study_period }}</small>
+                            </td>
+                            <td><span class="workspace-score">{{ row.result.marks }}%</span></td>
+                            <td>
+                                {% if row.grade %}
+                                    <span class="workspace-grade">{{ row.grade.grade_symbol }}</span>
+                                    <small class="workspace-cell-subtitle">{{ row.grade.grade_points }} points</small>
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td class="workspace-empty" colspan="5">
+                                <i class="bi bi-inbox" aria-hidden="true"></i>
+                                <strong>No results entered yet</strong>
+                                <span>Marks for your assigned units will appear here.</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "academics/base.html" %}
+{% load static %}
+
+{% block title %}Faculty Coordinator review{% endblock %}
+{% block page_context %}Coordinator workspace{% endblock %}
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'academics/css/workspace.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="workspace-page coordinator-workspace">
+    <section class="workspace-hero">
+        <div class="workspace-hero-copy">
+            <p class="workspace-eyebrow"><i class="bi bi-clipboard-check me-2" aria-hidden="true"></i>FACULTY COORDINATOR</p>
+            <h1>Results review</h1>
+            <p>Review recorded marks, grades, semester GPAs, and cumulative GPAs across the faculty.</p>
+        </div>
+        <span class="workspace-hero-icon" aria-hidden="true"><i class="bi bi-clipboard-data-fill"></i></span>
+    </section>
+
+    <section class="row g-3 workspace-stats" aria-label="Results overview">
+        <div class="col-sm-6">
+            <div class="workspace-stat">
+                <span class="workspace-stat-icon"><i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i></span>
+                <span class="workspace-stat-copy">
+                    <span class="workspace-stat-label">Results recorded</span>
+                    <strong class="workspace-stat-value">{{ result_count }}</strong>
+                </span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="workspace-stat">
+                <span class="workspace-stat-icon workspace-stat-icon-alt"><i class="bi bi-people-fill" aria-hidden="true"></i></span>
+                <span class="workspace-stat-copy">
+                    <span class="workspace-stat-label">Students represented</span>
+                    <strong class="workspace-stat-value">{{ student_count }}</strong>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <section class="workspace-panel">
+        <div class="workspace-panel-heading">
+            <div>
+                <h2><i class="bi bi-journal-check me-2" aria-hidden="true"></i>Recorded results</h2>
+                <p>Academic performance across recorded study sessions</p>
+            </div>
+            <span class="workspace-readonly"><i class="bi bi-eye me-1" aria-hidden="true"></i>Read only</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle workspace-table mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Student</th>
+                        <th scope="col">Course unit</th>
+                        <th scope="col">Study session</th>
+                        <th scope="col">Marks</th>
+                        <th scope="col">Grade</th>
+                        <th scope="col">Semester GPA</th>
+                        <th scope="col">CGPA</th>
+                        <th scope="col">Classification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in result_rows %}
+                        <tr>
+                            <td>
+                                <span class="workspace-student-name">{{ row.result.student.student_name }}</span>
+                                <small class="workspace-cell-subtitle">{{ row.result.student.reg_no }}</small>
+                            </td>
+                            <td>{{ row.result.unit.unit_name }}</td>
+                            <td>
+                                {{ row.result.session.academic_year }}
+                                <small class="workspace-cell-subtitle">Semester {{ row.result.session.semester }} · {{ row.result.session.study_period }}</small>
+                            </td>
+                            <td><span class="workspace-score">{{ row.result.marks }}%</span></td>
+                            <td>
+                                {% if row.grade %}
+                                    <span class="workspace-grade">{{ row.grade.grade_symbol }}</span>
+                                    <small class="workspace-cell-subtitle">{{ row.grade.grade_points }} points</small>
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </td>
+                            <td>{% if row.semester_gpa is not None %}{{ row.semester_gpa }} <small class="workspace-cell-subtitle">/ 5.00</small>{% else %}Not available{% endif %}</td>
+                            <td>{% if row.cgpa is not None %}{{ row.cgpa }} <small class="workspace-cell-subtitle">/ 5.00</small>{% else %}Not available{% endif %}</td>
+                            <td>
+                                {% if row.cgpa is None %}
+                                    <span class="workspace-classification workspace-classification-pending">Pending</span>
+                                {% elif row.first_class %}
+                                    <span class="workspace-classification workspace-classification-first">First Class</span>
+                                {% else %}
+                                    <span class="workspace-classification">Other</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td class="workspace-empty" colspan="8">
+                                <i class="bi bi-inbox" aria-hidden="true"></i>
+                                <strong>No results to review yet</strong>
+                                <span>Recorded student results will appear here.</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="workspace-panel-footer">
+            <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+            First Class threshold: CGPA of 4.40 or higher out of 5.00.
+        </div>
+    </section>
+</div>
+{% endblock %}

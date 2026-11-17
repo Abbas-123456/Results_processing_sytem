@@ -11,7 +11,7 @@ A Django application for managing faculties, courses, course units, lecturer ass
 
 ```powershell
 .venv\Scripts\Activate.ps1
-python manage.py migrate
+$env:DJANGO_DEBUG='true'
 python manage.py runserver
 ```
 
@@ -19,28 +19,15 @@ Open `http://127.0.0.1:8000/`; the root page redirects to the login page.
 
 ## Deploying to Render
 
-Create a Python web service from the `main` branch, leave Root Directory blank,
-and set:
+Create a Python web service from the `main` branch (or use `render.yaml`) and set:
 
-- Build Command: `pip install -r requirements.txt && python manage.py collectstatic --no-input`
-- Start Command: `python manage.py migrate --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:$PORT`
+- Build Command: `bash build.sh`
+- Start Command: `gunicorn core.wsgi:application`
+- Environment: `DJANGO_SECRET_KEY` (Generate Value), `PYTHON_VERSION=3.13.0`, `DJANGO_DEBUG=false`
 
-Attach a Render PostgreSQL database and make its internal connection URL
-available to the web service as `DATABASE_URL`. Add `DJANGO_SECRET_KEY` using
-Render's Generate Value option, and set `DJANGO_DEBUG` to `False`. Render's
-service hostname is detected automatically. If using a custom domain, include
-it in `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS`.
-
-The hosted database starts empty; the local SQLite database is not uploaded.
-After the first deploy, open the Render Shell and run
-`python manage.py createsuperuser --username admin` to create the administrator.
-Use a unique, strong password for the hosted administrator account.
-
-## Local demo accounts
-
-Local demo accounts are for development only. Create a separate superuser in
-the hosted database after deployment.
-
+The committed `db.sqlite3` is the live database; no external database is used.
+Render's free disk resets on every restart, so changes made on the live site are
+lost and the committed data returns. Demo login: `admin` / `admin123`.
 
 ## Group members
 

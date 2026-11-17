@@ -28,7 +28,7 @@ IS_RENDER = bool(
 )
 DEBUG = os.environ.get(
     'DJANGO_DEBUG',
-    'False' if IS_RENDER else 'True',
+    'True' if IS_RENDER else 'True',
 ).lower() in {'true', '1', 'yes'}
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')

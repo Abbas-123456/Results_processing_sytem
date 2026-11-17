@@ -3,7 +3,7 @@ services:
     name: result
     runtime: python
     buildCommand: "bash build.sh"
-    startCommand: "gunicorn core.wsgi:application"
+    startCommand: "python manage.py create_superuser && gunicorn core.wsgi:application"
     plan: free
     envVars:
       - key: DJANGO_SECRET_KEY
@@ -14,6 +14,12 @@ services:
           property: connectionString
       - key: PYTHON_VERSION
         value: 3.13.0
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_PASSWORD
+        value: admin123
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@example.com
 
 databases:
   - name: result-db
